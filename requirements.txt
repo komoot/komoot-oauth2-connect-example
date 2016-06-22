@@ -1,0 +1,4 @@
+oauth2
+flask
+requests_oauthlib
+argparse
