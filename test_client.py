@@ -67,7 +67,7 @@ def profile():
     username = session['oauth_token']['username']
 
     # fetch json document from main api
-    response = oauth_session.get('https://public.api.komoot.de/v007/users/{}/tours/'.format(username))
+    response = oauth_session.get('https://external-api.komoot.de/v007/users/{}/tours/'.format(username))
     tours = response.json()
     return jsonify(tours)
 
