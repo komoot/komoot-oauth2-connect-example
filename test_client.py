@@ -8,8 +8,7 @@ import argparse
 app = Flask(__name__)
 
 
-# This information is obtained upon registration of a new GitHub OAuth
-# application here: https://github.com/settings/applications/new
+# This information is obtained upon registration for the komoot-connect beta program.
 client_id = None
 client_secret = None
 base_url = None
