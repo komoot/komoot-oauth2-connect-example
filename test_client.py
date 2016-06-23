@@ -62,11 +62,14 @@ def profile():
     """ Step 3: Fetching a protected resource using an OAuth 2 token.
     """
     oauth_session = OAuth2Session(client_id, token=session['oauth_token'])
+
+    # the username is needed for most requests and therefore in the token response
     username = session['oauth_token']['username']
 
     # fetch json document from main api
-    tours = oauth_session.get('https://public.api.komoot.de/v006/tours/?username={}'.format(username))
-    return jsonify(tours).json()
+    response = oauth_session.get('https://public.api.komoot.de/v007/users/{}/tours/'.format(username))
+    tours = response.json()
+    return jsonify(tours)
 
 
 if __name__ == "__main__":
@@ -87,9 +90,8 @@ if __name__ == "__main__":
     client_secret = args.csecret
     base_url = args.baseurl
 
-    # If you selected a localhost endpoint for debugging above, we are not strict about https
-    if base_url.startswith('http://localhost'):
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    # Since this is a test client running on localhost: Don't enforce SSL.
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
     os.environ['DEBUG'] = "1"
