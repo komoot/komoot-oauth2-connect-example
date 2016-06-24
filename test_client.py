@@ -1,9 +1,11 @@
 from requests_oauthlib import OAuth2Session
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
+from oauthlib.oauth2.rfc6749.errors import TokenExpiredError
 import logging
 import os
 import argparse
+
 
 app = Flask(__name__)
 
@@ -17,7 +19,7 @@ base_url = None
 redirect_uri = 'http://localhost:5000/callback'
 
 @app.route("/")
-def demo():
+def index():
     """Step 1: User Authorization.
 
     Redirect the user/resource owner to the OAuth provider (komoot)
@@ -43,6 +45,8 @@ def callback():
     in the redirect URL. We will use that to obtain an access token.
     """
 
+    # Requests oauth2 credentials (refresh-token, access-token, username)
+    # Request uses Basic Authentication with client_id and client_secret
     token_url = base_url + 'oauth/token'
     oauth_session = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
     token = oauth_session.fetch_token(token_url, username=client_id, password=client_secret,
@@ -60,13 +64,30 @@ def callback():
 def profile():
     """ Step 3: Fetching a protected resource using an OAuth 2 token.
     """
+    if not 'oauth_token' in session:
+        return redirect(url_for('.index'))
+
+    token_url = base_url + 'oauth/token'
     oauth_session = OAuth2Session(client_id, token=session['oauth_token'])
 
     # the username is needed for most requests and therefore in the token response
     username = session['oauth_token']['username']
 
     # fetch json document from main api
-    response = oauth_session.get('https://external-api.komoot.de/v007/users/{}/tours/'.format(username))
+    try:
+        response = oauth_session.get('https://external-api.komoot.de/v007/users/{}/tours/'.format(username))
+    except TokenExpiredError:
+        # access_token has expired, refresh
+        # Check 'expires_in' property before sending the request and act on 401 "error"="invalid_token"
+        # Request uses Basic Authentication with client_id and client_secret
+
+        new_token = oauth_session.refresh_token(token_url, refresh_token=session['oauth_token']['refresh_token'], auth=(client_id, client_secret))
+
+        # retry request
+        oauth_session = OAuth2Session(client_id, token=new_token)
+        session['oauth_token'] = new_token
+        response = oauth_session.get('https://external-api.komoot.de/v007/users/{}/tours/'.format(username))
+
     tours = response.json()
     return jsonify(tours)
 
