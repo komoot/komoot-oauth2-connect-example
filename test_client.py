@@ -86,7 +86,8 @@ def profile():
         # retry request
         oauth_session = OAuth2Session(client_id, token=new_token)
         session['oauth_token'] = new_token
-        response = oauth_session.get('https://external-api.komoot.de/v007/users/{}/tours/'.format(username))
+        url = 'https://external-api.komoot.de/v007/users/{}/tours/'.format(username)
+        response = oauth_session.get(url, headers={'Accept': 'application/hal+json'})
 
     tours = response.json()
     return jsonify(tours)
