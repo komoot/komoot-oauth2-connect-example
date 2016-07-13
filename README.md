@@ -9,5 +9,5 @@ This feature is currently in private beta.
  1. Create a python virtual environment ```virtualenv --distribute -p python3 .env```
  1. Activate the virtual environment ```. .env/bin/activate.fish``` (for the fish shell) or ```. .env/bin/activate``` (bash)
  1. Install dependencies ```pip install -r requirements.txt```
- 1. Run the server application ```python test_server.py --client-id XXX --client-secret YYY````
+ 1. Run the server application ```python test_client.py --client-id XXX --client-secret YYY````
  1. Open your browser [http://localhost:5000/](localhost:5000/) and login with a regular komoot user accout (Note, during beta not all accounts are whitelisted for OAuth2).
