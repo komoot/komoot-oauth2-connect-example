@@ -1,7 +1,7 @@
 # komoot-oauth2-connect-example
 Example application to connect to komoot via oauth2
 
-This feature is currently in beta, you need an invitation to use it.
+To use this demo code you need valid oauth2 credentials. You can apply for them here: https://www.komoot.de/b2b/connect#profileconnect .
 
 ## Run it locally
 
