@@ -1,4 +1,4 @@
 oauth2
 flask
-requests_oauthlib
+requests_oauthlib==1.0.0
 argparse
