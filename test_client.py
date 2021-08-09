@@ -6,16 +6,15 @@ import logging
 import os
 import argparse
 
-
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
-
 
 # This information is obtained upon registration for the komoot-connect beta program.
 client_id = None
 client_secret = None
 base_url = None
 
-# must match the host and port of this application
+# must match the host and port of this application (step 2)
 redirect_uri = 'http://localhost:5000/callback'
 
 @app.route("/")
@@ -25,11 +24,13 @@ def index():
     Redirect the user/resource owner to the OAuth provider (komoot)
     using an URL with a few key OAuth parameters.
     """
+
     authorization_base_url = base_url + 'oauth/authorize'
     oauth_session = OAuth2Session(client_id, redirect_uri=redirect_uri)
     authorization_url, state = oauth_session.authorization_url(authorization_base_url)
 
     # State is used to prevent CSRF, keep this for later.
+    logger.info("authorization url: {} state: {}".format(authorization_url, state))
     session['oauth_state'] = state
     return redirect(authorization_url)
 
@@ -48,6 +49,8 @@ def callback():
     # Requests oauth2 credentials (refresh-token, access-token, username)
     # Request uses Basic Authentication with client_id and client_secret
     token_url = base_url + 'oauth/token'
+    if len(session) == 0:
+        raise ValueError("Cookie session is empty: {}".format(session))
     oauth_session = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
     token = oauth_session.fetch_token(token_url, username=client_id, password=client_secret,
                                authorization_response=request.url)
@@ -104,7 +107,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='komoot oauth2 test client.')
     parser.add_argument('--client-id', dest='cid', help='client id you got from komoot')
     parser.add_argument('--client-secret', dest='csecret', help='client secret you got from komoot')
-    parser.add_argument('--base-url', dest='baseurl', default='https://auth.komoot.de/', help='base url for authentication requests')
+    parser.add_argument('--base-url', dest='baseurl', default='https://auth-api.main.komoot.net/', help='base url for authentication requests')
 
     args = parser.parse_args()
     client_id = args.cid
@@ -113,7 +116,6 @@ if __name__ == "__main__":
 
     # Since this is a test client running on localhost: Don't enforce SSL.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
 
     os.environ['DEBUG'] = "1"
     app.secret_key = os.urandom(24)
