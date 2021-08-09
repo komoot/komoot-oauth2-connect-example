@@ -1,4 +1,4 @@
-oauth2
-flask
-requests_oauthlib==1.0.0
+oauth2==1.9.0.post1
+flask==1.1.1
+requests_oauthlib==1.1.0
 argparse
