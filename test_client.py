@@ -107,7 +107,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='komoot oauth2 test client.')
     parser.add_argument('--client-id', dest='cid', help='client id you got from komoot')
     parser.add_argument('--client-secret', dest='csecret', help='client secret you got from komoot')
-    parser.add_argument('--base-url', dest='baseurl', default='https://auth.komoot.de/', help='base url for authentication requests')
+    parser.add_argument('--base-url', dest='baseurl', default='https://auth-api.main.komoot.net/', help='base url for authentication requests')
 
     args = parser.parse_args()
     client_id = args.cid
